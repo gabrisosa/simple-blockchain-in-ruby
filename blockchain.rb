@@ -51,10 +51,10 @@ end
 def add_block
 	i = 1
 	loop do
-		if (i-2) >= 0
-			instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-2}")), (instance_variable_get("@b#{i-1}")), get_transactions_data))
-		else
+		if (i-2) <= 0
 			instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-1}")), (instance_variable_get("@b#{i-1}")), get_transactions_data))
+		else
+			instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-2}")), (instance_variable_get("@b#{i-1}")), get_transactions_data))
 		end
 		LEDGER << instance_variable_get("@b#{i}")
 		p "============================"
