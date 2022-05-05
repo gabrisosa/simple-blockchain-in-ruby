@@ -1,15 +1,17 @@
 class Block
   attr_reader :index, :timestamp, :transactions, 
-							:transactions_count, :previous_hash, 
+							:transactions_count, :previous_hash,
+              :previous_previous_hash, 
 							:nonce, :hash 
 
-  def initialize(index, transactions, previous_hash)
-    @index         		 	 = index
-    @timestamp      	 	 = Time.now
-    @transactions 	 		 = transactions
-		@transactions_count  = transactions.size
-    @previous_hash 		 	 = previous_hash
-    @nonce, @hash  		 	 = compute_hash_with_proof_of_work
+  def initialize(index, transactions, previous_previous_hash, previous_hash)
+    @index                  = index
+    @timestamp              = Time.now
+    @transactions           = transactions
+		@transactions_count     = transactions.size
+    @previous_hash          = previous_hash
+    @previous_previous_hash = previous_previous_hash  
+    @nonce, @hash           = compute_hash_with_proof_of_work
   end
 
 	def compute_hash_with_proof_of_work(difficulty="00")
@@ -26,21 +28,23 @@ class Block
 	
   def calc_hash_with_nonce(nonce=0)
     sha = Digest::SHA256.new
-    sha.update( nonce.to_s + 
-								@index.to_s + 
-								@timestamp.to_s + 
-								@transactions.to_s + 
-								@transactions_count.to_s +	
-								@previous_hash )
+    sha.update( nonce.to_s +
+								@index.to_s +
+								@timestamp.to_s +
+								@transactions.to_s +
+								@transactions_count.to_s +
+								@previous_hash +
+                @previous_previous_hash
+                )
     sha.hexdigest 
   end
 
   def self.first( *transactions )    # Create genesis block
     ## Uses index zero (0) and arbitrary previous_hash ("0")
-    Block.new( 0, transactions, "0" )
+    Block.new( 0, transactions, "0", "0" ) # Defines previous_hash and previous_previous_hash
   end
 
-  def self.next( previous, transactions )
-    Block.new( previous.index+1, transactions, previous.hash )
+  def self.next( previous_previous, previous, transactions )
+    Block.new( previous_previous.index+2, transactions, previous_previous.hash, previous.hash )
   end
 end  # class Block

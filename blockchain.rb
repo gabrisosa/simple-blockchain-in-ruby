@@ -20,7 +20,7 @@
 
 require 'digest'    							# For hash checksum digest function SHA256
 require 'pp'        							# For pp => pretty printer
-require 'pry'                     # For on the fly debugging
+# require 'pry'                     # For on the fly debugging
 require_relative 'block'					# class Block
 require_relative 'transaction'		# method Transactions
 
@@ -35,7 +35,6 @@ LEDGER = []
 ## 	when a user has finish to add transaction, 
 ##  the block is added to the blockchain and writen in the ledger
 
-
 def create_first_block
 	i = 0
 	instance_variable_set( "@b#{i}", 
@@ -48,13 +47,15 @@ def create_first_block
 	p "============================"
 	add_block
 end
-	
-	
-	
+
 def add_block
 	i = 1
 	loop do
-		instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-1}")), get_transactions_data))
+		if (i-2) >= 0
+			instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-2}")), (instance_variable_get("@b#{i-1}")), get_transactions_data))
+		else
+			instance_variable_set("@b#{i}", Block.next( (instance_variable_get("@b#{i-1}")), (instance_variable_get("@b#{i-1}")), get_transactions_data))
+		end
 		LEDGER << instance_variable_get("@b#{i}")
 		p "============================"
 		pp instance_variable_get("@b#{i}")
@@ -84,6 +85,5 @@ def launcher
 	puts "==========================="
 	create_first_block
 end
-
 
 launcher
